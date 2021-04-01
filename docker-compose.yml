@@ -1,0 +1,6 @@
+version: '3.1'
+services:
+  rest-service:
+    image: firebase-auth-be-test:0.0.1-SNAPSHOOT
+    ports: 
+      - "8080:8080"
