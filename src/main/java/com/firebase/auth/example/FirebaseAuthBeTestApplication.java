@@ -11,4 +11,3 @@ public class FirebaseAuthBeTestApplication {
 	}
 
 }
-// set MAVEN_OPTS=-Dhttp.proxyHost=10.225.3.1 -Dhttp.proxyPort=3128 -Dhttps.proxyHost=10.225.3.1 -Dhttps.proxyPort=3128

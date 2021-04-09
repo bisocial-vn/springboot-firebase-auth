@@ -39,6 +39,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //		http.exceptionHandling().defaultAuthenticationEntryPointFor(, CommonConstant.PROTECTED_URLS)
 		http.authorizeRequests().requestMatchers(CommonConstant.PROTECTED_URLS).authenticated();
+		http.authorizeRequests().antMatchers("/h2-ui/**").permitAll();
+		http.headers().frameOptions().sameOrigin();
 	}
 
 	@Override

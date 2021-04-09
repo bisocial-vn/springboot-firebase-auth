@@ -104,6 +104,7 @@
 							<HTTPS_PROXY>http://10.225.3.1:3128</HTTPS_PROXY>
 						</env>
 						<name>${project.artifactId}:${project.version}</name>
+						<pullPolicy>IF_NOT_PRESENT</pullPolicy>
 						<!-- <publish>true</publish> -->
 					</image>
 					<!-- <docker> <publishRegistry> <username>mrbi9x</username> <password></password> 
