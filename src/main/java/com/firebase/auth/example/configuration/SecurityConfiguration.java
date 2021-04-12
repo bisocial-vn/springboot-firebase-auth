@@ -24,10 +24,18 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.firebase.auth.example.constant.CommonConstant;
+import com.firebase.auth.example.security.AccountDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+	private AccountDetailsService accountDetailsService;
+
+	public SecurityConfiguration(AccountDetailsService accountDetailsService) {
+//		super(true);
+		this.accountDetailsService = accountDetailsService;
+	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -50,7 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication();
+		auth.userDetailsService(accountDetailsService).passwordEncoder(passwordEncoder());
 	}
 
 	@Bean
@@ -60,8 +68,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		encoders.put("bcrypt", new BCryptPasswordEncoder());
 		encoders.put("pbkdf2", new Pbkdf2PasswordEncoder());
 		encoders.put("scrypt", new SCryptPasswordEncoder());
-//		encoders.put("noop", NoOpPasswordEncoder.getInstance());
-//		encoders.put("sha256", new StandardPasswordEncoder());
 
 		PasswordEncoder passwordEncoder = new DelegatingPasswordEncoder(defaultEncoder, encoders);
 		return passwordEncoder;

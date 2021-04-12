@@ -5,50 +5,59 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.firebase.auth.example.entity.AccountEntity;
+
 public class AccountDetails implements UserDetails {
 
 	private static final long serialVersionUID = 238209870451420114L;
 
+	private AccountEntity accountEntity;
+
+	public AccountDetails(AccountEntity accountEntity) {
+		this.accountEntity = accountEntity;
+	}
+
+	public String getEmail() {
+		return accountEntity.getEmail();
+	}
+
+	public String getPhone() {
+		return this.accountEntity.getPhone();
+	}
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
+		return accountEntity.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getEmail() == null ? this.getPhone() : this.getEmail();
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

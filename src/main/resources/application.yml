@@ -14,3 +14,7 @@ spring:
     username: sa
     password:
     driverClassName: org.h2.Driver
+app:
+  firebase:
+    credential:
+      path: ${APP_FIREBASE_CREDENTIAL_PATH}
