@@ -2,16 +2,20 @@ package com.firebase.auth.example.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Entity(name = "Account")
 @Table(name = "ACCOUNT")
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class AccountEntity extends BasicEntityAudit {
+public class AccountEntity {
+
+	@Id
+	@GeneratedValue
+	private long id;
 
 	@Column(unique = true, name = "EMAIL")
 	private String email;

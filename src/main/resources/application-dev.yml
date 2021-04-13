@@ -3,6 +3,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
     open-in-view: false
   h2:
     console:
@@ -12,3 +13,4 @@ app:
   firebase:
     credential:
       path: ${APP_FIREBASE_CREDENTIAL_PATH}
+      

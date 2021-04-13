@@ -1,8 +1,0 @@
-
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: false
-      
