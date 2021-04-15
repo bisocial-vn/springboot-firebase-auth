@@ -16,7 +16,6 @@
 	<description>Firebase auth test server</description>
 	<properties>
 		<java.version>1.8</java.version>
-		<spring-native.version>0.9.1</spring-native.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -34,11 +33,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.experimental</groupId>
-			<artifactId>spring-native</artifactId>
-			<version>${spring-native.version}</version>
 		</dependency>
 
 		<dependency>
@@ -107,75 +101,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<image>
-						<builder>paketobuildpacks/builder:tiny</builder>
-						<env>
-							<BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-							<HTTP_PROXY>http://10.225.3.1:3128</HTTP_PROXY>
-							<HTTPS_PROXY>http://10.225.3.1:3128</HTTPS_PROXY>
-						</env>
-						<name>${project.artifactId}:${project.version}</name>
-						<pullPolicy>IF_NOT_PRESENT</pullPolicy>
-						<!-- <publish>true</publish> -->
-					</image>
-					<!-- <docker> <publishRegistry> <username>mrbi9x</username> <password></password> 
-						<url>https://ghcr.io</url> </publishRegistry> </docker> -->
+					<layers>
+						<enabled>true</enabled>
+					</layers>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.experimental</groupId>
-				<artifactId>spring-aot-maven-plugin</artifactId>
-				<version>${spring-native.version}</version>
-				<executions>
-					<execution>
-						<id>test-generate</id>
-						<goals>
-							<goal>test-generate</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.hibernate.orm.tooling</groupId>
-				<artifactId>hibernate-enhance-maven-plugin</artifactId>
-				<version>${hibernate.version}</version>
-				<executions>
-					<execution>
-						<id>enhance</id>
-						<goals>
-							<goal>enhance</goal>
-						</goals>
-						<configuration>
-							<failOnError>true</failOnError>
-							<enableLazyInitialization>true</enableLazyInitialization>
-							<enableDirtyTracking>true</enableDirtyTracking>
-							<enableAssociationManagement>true</enableAssociationManagement>
-							<enableExtendedEnhancement>false</enableExtendedEnhancement>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
-	<repositories>
-		<repository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/release</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/release</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 </project>

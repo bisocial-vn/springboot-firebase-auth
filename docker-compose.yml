@@ -5,7 +5,7 @@ services:
     ports: 
       - "8080:8080"
     volumes:
-      - /mnt/c/Users/nvminh8/fir-auth-test-be3bb-firebase-adminsdk-h43gm-2d8167fd8a.json:/fir-auth-test-be3bb-firebase-adminsdk-h43gm-2d8167fd8a.json
+      - ./fir-auth-test-be3bb-firebase-adminsdk-h43gm-2d8167fd8a.json:/.secret/firebase-key.json
     environment:
-      - APP_FIREBASE_CREDENTIAL_PATH=/fir-auth-test-be3bb-firebase-adminsdk-h43gm-2d8167fd8a.jsonaaaabv
-      - GOOGLE_APPLICATION_CREDENTIALS=/fir-auth-test-be3bb-firebase-adminsdk-h43gm-2d8167fd8a.json
+      - APP_FIREBASE_CREDENTIAL_PATH=/.secret/firebase-key.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/.secret/firebase-key.json
