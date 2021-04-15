@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/eclipse-formatter.xml
+/src/main/resources/firebasse-config.json
