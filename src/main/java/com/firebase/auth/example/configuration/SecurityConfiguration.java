@@ -7,6 +7,9 @@ import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,8 +36,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private AccountDetailsService accountDetailsService;
 
 	public SecurityConfiguration(AccountDetailsService accountDetailsService) {
-//		super(true);
+		super(true);
 		this.accountDetailsService = accountDetailsService;
+	}
+
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
 	}
 
 	@Override
@@ -56,9 +65,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		web.ignoring().requestMatchers(CommonConstant.PUBLIC_URLS);
 	}
 
+	@Bean
+	public DaoAuthenticationProvider configDaoAuthenticationProvider() {
+		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+		daoAuthenticationProvider.setUserDetailsService(accountDetailsService);
+		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+		return daoAuthenticationProvider;
+	}
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(accountDetailsService).passwordEncoder(passwordEncoder());
+		auth.authenticationProvider(configDaoAuthenticationProvider());
 	}
 
 	@Bean
