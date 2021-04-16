@@ -16,8 +16,11 @@ import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Comparator;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -77,6 +80,18 @@ public class TestGenerateKeyPair {
 			assertFalse(Files.exists(tmpFolderPath));
 
 		}
+	}
+
+	@Test
+	@DisplayName("testGenerateKeyPairForJwtToken")
+	public void testGenerateKeyPairForJwtToken() {
+		KeyPair rsa256KeyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
+		PublicKey rsaPublicKey = rsa256KeyPair.getPublic();
+		PrivateKey rsaPrivateKey = rsa256KeyPair.getPrivate();
+		log.info("{}. RSA private key: \n{}\n", SignatureAlgorithm.RS256,
+				Base64.getEncoder().encodeToString(rsaPrivateKey.getEncoded()));
+		log.info("{}. RSA public key:\n{}\n", SignatureAlgorithm.RS256,
+				Base64.getEncoder().encodeToString(rsaPublicKey.getEncoded()));
 	}
 
 }
