@@ -20,7 +20,7 @@ public class FallbackErrorHandler implements ErrorController {
 	private static final String DEFAULT_ERROR_PATH = "/error";
 	private ErrorAttributes errorAttributes;
 
-	@Value("${debug}")
+	@Value("${debug:false}")
 	private boolean isDebug = false;
 
 	public FallbackErrorHandler(ErrorAttributes errorAttributes) {

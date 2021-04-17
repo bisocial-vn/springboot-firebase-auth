@@ -23,17 +23,18 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public String authenticationUser(String emailOrPhone, String password) throws AuthenticationException {
+	public String authenticationUser(String emailOrPhone, String password, boolean isRemember)
+			throws AuthenticationException {
 		UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(emailOrPhone,
 				password);
 		Authentication authenticated = this.authenticationManager.authenticate(loginToken);
 //		if (authenticated.getAuthorities() == null || authenticated.getAuthorities().isEmpty()) {
 //			throw new RuntimeException("Access denied. Empty role.");
 //		}
-		if (!AccountDetails.class.isInstance(authenticated.getDetails())) {
+		if (!AccountDetails.class.isInstance(authenticated.getPrincipal())) {
 			throw new RuntimeException("Can not get authentication details.");
 		}
-		AccountDetails accountDetails = (AccountDetails) authenticated.getDetails();
+		AccountDetails accountDetails = (AccountDetails) authenticated.getPrincipal();
 		return UUID.randomUUID().toString();
 	}
 

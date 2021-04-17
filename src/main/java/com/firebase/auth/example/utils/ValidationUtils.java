@@ -76,6 +76,15 @@ public class ValidationUtils {
 		}
 	}
 
+	public void validatePassword(String password) throws RuntimeException {
+		if (!StringUtils.hasText(password)) {
+			throw new IllegalArgumentException("Password is required.");
+		}
+		if (password.length() < 6) {
+			throw new IllegalArgumentException("Password atlest 6 char.");
+		}
+	}
+
 	public boolean isMatchPattern(String regex, String input) {
 		if (!StringUtils.hasText(input) || !StringUtils.hasText(regex)) {
 			return false;
