@@ -16,28 +16,40 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.firebase.auth.example.constant.CommonConstant;
 import com.firebase.auth.example.security.AccountDetailsService;
+import com.firebase.auth.example.security.FobiddenHiddenHandler;
+import com.firebase.auth.example.security.JwtTokenAuthenticationFilter;
+import com.firebase.auth.example.security.NoRedirectStrategy;
+import com.firebase.auth.example.security.UnauthenticationHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	private AccountDetailsService accountDetailsService;
+	private UnauthenticationHandler unauthenticationHandler;
+	private FobiddenHiddenHandler fobiddenHiddenHandler;
 
-	public SecurityConfiguration(AccountDetailsService accountDetailsService) {
+	public SecurityConfiguration(AccountDetailsService accountDetailsService,
+			UnauthenticationHandler unauthenticationHandler, FobiddenHiddenHandler fobiddenHiddenHandler) {
 		super(true);
 		this.accountDetailsService = accountDetailsService;
+		this.unauthenticationHandler = unauthenticationHandler;
+		this.fobiddenHiddenHandler = fobiddenHiddenHandler;
 	}
 
 	@Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -54,9 +66,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.logout().disable();
 		http.cors(Customizer.withDefaults());
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//		http.exceptionHandling().defaultAuthenticationEntryPointFor(, CommonConstant.PROTECTED_URLS)
+		http.exceptionHandling().defaultAuthenticationEntryPointFor(unauthenticationHandler,
+				CommonConstant.PROTECTED_URLS);
+		http.exceptionHandling().defaultAccessDeniedHandlerFor(fobiddenHiddenHandler, CommonConstant.PROTECTED_URLS);
+		http.authorizeRequests().requestMatchers(CommonConstant.PUBLIC_URLS).permitAll();
 		http.authorizeRequests().requestMatchers(CommonConstant.PROTECTED_URLS).authenticated();
 		http.authorizeRequests().antMatchers("/h2-ui/**").permitAll();
+		http.addFilterBefore(jwtTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		http.headers().frameOptions().sameOrigin();
 	}
 
@@ -102,6 +118,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		source.registerCorsConfiguration("/**", configuration);
 		// TODO add cors config for auth / PROTECTED_URLS
 		return source;
+	}
+
+	@Bean
+	GrantedAuthorityDefaults grantedAuthorityDefaults() {
+		return new GrantedAuthorityDefaults(""); // Remove the ROLE_ prefix
+	}
+
+	@Bean
+	SimpleUrlAuthenticationSuccessHandler successHandler() {
+		final SimpleUrlAuthenticationSuccessHandler successHandler = new SimpleUrlAuthenticationSuccessHandler();
+		successHandler.setRedirectStrategy(new NoRedirectStrategy());
+		return successHandler;
+	}
+
+	@Bean
+	JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter() throws Exception {
+		final JwtTokenAuthenticationFilter filter = new JwtTokenAuthenticationFilter(CommonConstant.PROTECTED_URLS);
+		filter.setAuthenticationManager(this.authenticationManager());
+		filter.setAuthenticationSuccessHandler(successHandler());
+		return filter;
 	}
 
 }

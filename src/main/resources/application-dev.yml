@@ -1,5 +1,6 @@
-
 spring:
+  application:
+    name: firebase-auth-test
   jpa:
     hibernate:
       ddl-auto: update
@@ -9,8 +10,31 @@ spring:
     console:
       enabled: true
       path: /h2-ui
+  web:
+    resources:
+      add-mappings: false
+debug: true
+logging:
+  level:
+    root: info
+    '[org.springframework.beans]': error
+    '[org.springframework.web]': debug
+    '[org.springframework.transaction]': debug
+    '[org.springframework.boot.autoconfigure]': error
+    '[org.hibernate]': info
+    '[javax.transaction]': debug
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+
 app:
+  jwt:
+    privatekeyPath: ${JWT_PRIVATEKEY_PATH}
+    publickey: ${JWT_PUBLICKEY}
+    accessTokenDuration: 1d
+    refreshTokenDuration : 30d
   firebase:
     credential:
       path: ${APP_FIREBASE_CREDENTIAL_PATH}
-      
