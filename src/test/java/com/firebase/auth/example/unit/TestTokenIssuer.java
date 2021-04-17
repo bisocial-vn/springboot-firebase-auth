@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.firebase.auth.example.core.jwt.TokenIssuer;
+import com.firebase.auth.example.core.jwt.JwtTokenIssuer;
 
 import io.jsonwebtoken.io.Encoders;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class TestTokenIssuer {
 	public void testIssuanceTokenWithRSA256PrivateKey() throws Exception {
 		log.info("test Issuance Token With RSA256 bit PrivateKey");
 		PrivateKey privateKey = this.generatePrivateKeyWithSize(2048);
-		String token = TokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(),
+		String token = JwtTokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(),
 				Duration.ofDays(1l).toMillis(), null);
 		log.info("Token: {}", token);
 		assertNotNull(token);
@@ -36,7 +36,7 @@ public class TestTokenIssuer {
 	public void testIssuanceTokenWithRSA384PrivateKey() throws Exception {
 		log.info("test Issuance Token With RSA384 bit PrivateKey");
 		PrivateKey privateKey = this.generatePrivateKeyWithSize(3072);
-		String token = TokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(),
+		String token = JwtTokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(),
 				Duration.ofDays(1l).toMillis(), null);
 		log.info("Token: {}", token);
 		assertNotNull(token);
@@ -46,7 +46,7 @@ public class TestTokenIssuer {
 	public void testIssuanceTokenWithRSA512PrivateKey() throws Exception {
 		log.info("test Issuance Token With RSA512 PrivateKey");
 		PrivateKey privateKey = this.generatePrivateKeyWithSize(4096);
-		String token = TokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(),
+		String token = JwtTokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(),
 				Duration.ofDays(1l).toMillis(), null);
 		log.info("Token: {}", token);
 		assertNotNull(token);
@@ -55,7 +55,7 @@ public class TestTokenIssuer {
 	@Test
 	public void testInvalidPrivateKey() {
 		Throwable exception = assertThrows(RuntimeException.class, () -> {
-			TokenIssuer.getInstance().issuanceToken(null, UUID.randomUUID().toString(), 0, null);
+			JwtTokenIssuer.getInstance().issuanceToken(null, UUID.randomUUID().toString(), 0, null);
 		});
 		log.info("testInvalidPrivateKey: {}", exception.getMessage());
 	}
@@ -64,7 +64,7 @@ public class TestTokenIssuer {
 	public void testInvalidPrivateKeyLength() throws NoSuchAlgorithmException {
 		PrivateKey privateKey = this.generatePrivateKeyWithSize(2047);
 		Throwable exception = assertThrows(RuntimeException.class, () -> {
-			TokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(), 0, null);
+			JwtTokenIssuer.getInstance().issuanceToken(privateKey, UUID.randomUUID().toString(), 0, null);
 		});
 		log.info("testInvalidPrivateKeyLength: {}", exception.getMessage());
 	}

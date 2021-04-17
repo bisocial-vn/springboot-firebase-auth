@@ -1,11 +1,12 @@
-package com.firebase.auth.example.configuration;
+package com.firebase.auth.example.firebase;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.UrlResource;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -17,25 +18,36 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FirebaseConfiguration {
 
-	@Value("${app.firebase.credential.path:/test.json}")
+	@Value("${app.firebase.credential.path}")
 	private String firebaseCredentialPath;
 
 	@Bean
-	public FirebaseApp initial() {
+	public FirebaseApp firebaseApp() {
 		GoogleCredentials googleCredentials = null;
 		try {
-			FileInputStream firebaseCredentialFileInputStream = new FileInputStream(firebaseCredentialPath);
-			googleCredentials = GoogleCredentials.fromStream(firebaseCredentialFileInputStream);
+			InputStream firbCredentialInputStream = new UrlResource(firebaseCredentialPath).getInputStream();
+			googleCredentials = GoogleCredentials.fromStream(firbCredentialInputStream);
 		} catch (IOException ex) {
 			try {
 				log.info("Initial firebase with default. firebaseCredentialPath: {}", firebaseCredentialPath);
 				googleCredentials = GoogleCredentials.getApplicationDefault();
-			} catch (IOException ex1) {
-				throw new RuntimeException("Fail to get google credential for firebase app.", ex);
+			} catch (IOException ioEx) {
+				log.error("Initial Firebase app fail: ", ioEx);
+				log.debug("Config firebase credential path: {}", firebaseCredentialPath);
 			}
 		}
-		FirebaseOptions firebaseOptions = FirebaseOptions.builder().setCredentials(googleCredentials).build();
-		FirebaseApp firebaseAppInstance = FirebaseApp.initializeApp(firebaseOptions);
+		if (googleCredentials == null) {
+			return null;
+		}
+
+		FirebaseApp firebaseAppInstance = null;
+		try {
+			FirebaseOptions firebaseOptions = FirebaseOptions.builder().setCredentials(googleCredentials).build();
+			firebaseAppInstance = FirebaseApp.initializeApp(firebaseOptions);
+		} catch (Exception e) {
+			log.error("Initial Firebase app fail: ", e);
+			log.debug("Config firebase credential path: {}", firebaseCredentialPath);
+		}
 
 		log.info("Initial Firebase app success.\n\tApp name: {}", firebaseAppInstance.getName());
 		log.info("Firebase Databasr URL: {}", firebaseAppInstance.getOptions().getDatabaseUrl());

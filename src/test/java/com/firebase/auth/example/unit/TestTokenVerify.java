@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.firebase.auth.example.core.jwt.TokenVerify;
+import com.firebase.auth.example.core.jwt.JwtTokenVerify;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +23,7 @@ public class TestTokenVerify {
 	@Test
 	public void testVerifyToken() throws Exception {
 		String jwtToken = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyNmFkNDEzZC04OTViLTRhMzUtYWI3OC05OWU0MGM3MWU2MDIiLCJpYXQiOjE2MTg1NjUzMTQsImV4cCI6MTY1MDEwMTMxNH0.MxyoqTN2Vjc488LJi4s5VRx9yMDwTNf98OhjOhMewAcCNHV9Omm3AF1ylSJClSBPBFjnZ_Ov2i0aeB5NiEkNAktgSs1_fE7o-nwXC3LxzRXXSaXcNHJFp-bVJLXOIF9M3_j9zqplBIeEkIoxi8GFLZruAuhY_1VlcMkE5vOfxEgTs1bfDWSrzdLwdsn4BlND4UwZfKYFkscUKBWQybHqk0TWxL0ODiXtel2vL3hJ6954vmUdJhuS8BAOBpXxBPoEbort9vxict0DfPRpe5OXjxryDRgs2V_oLFkUsRIhuw9l84Yue1TQyrZ2R7Pxi0scPAX5Igc8hvY5bNDeB6IrLQ";
-		TokenVerify verifyTokenInstance = TokenVerify.getInstance();
+		JwtTokenVerify verifyTokenInstance = JwtTokenVerify.getInstance();
 		String base64PublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn50c8PSdxKYqv4jW5V9wjdDMZr5xZhVDlFNrwVVb170ZWLqKUvado9bnJFad+i1Bsvyhsqln8vHCCAxGPDSrbw8AffrES8JBw1xb6p2QyBtr+GqS7k4S8EMgOY1Cw0RmBLUxyfTd0Rwg3oeOvSGJRcYdcQEy114eIL4gfYV3Hbd9TvArtB0cynkPTR6Q8KzEbWR8PJ7rwhKZyxDbpUTVjKw6mcbKrSMcRD5lvgsZVZk1uweDi30j7haD/IjoCgv9UfcYETRI2QSwW5g472Pd7tR4cmEqWnJC99NleNzdQK5iG4rL9+06PePgqJq05+I5Ed+XlPfzLK8ukE1I8rv0kwIDAQAB";
 		byte[] rawPublicKey = Base64.getDecoder().decode(base64PublicKey);
 		X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(rawPublicKey);
@@ -42,7 +42,7 @@ public class TestTokenVerify {
 		X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(rawPublicKey);
 		PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(publicKeySpec);
 		Throwable error = assertThrows(RuntimeException.class, () -> {
-			TokenVerify.getInstance().verifyToken(publicKey, jwtToken);
+			JwtTokenVerify.getInstance().verifyToken(publicKey, jwtToken);
 		}, "Must throw exeption because invalid public key.");
 		log.debug(error.getMessage(), error);
 		log.info("Error message: {}", error.getMessage());
@@ -56,7 +56,7 @@ public class TestTokenVerify {
 		X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(rawPublicKey);
 		PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(publicKeySpec);
 		Throwable error = assertThrows(RuntimeException.class, () -> {
-			TokenVerify.getInstance().verifyToken(publicKey, jwtToken);
+			JwtTokenVerify.getInstance().verifyToken(publicKey, jwtToken);
 		}, "Must throw exeption because token had expiried.");
 		log.debug(error.getMessage(), error);
 		log.info("Error message: {}", error.getMessage());

@@ -14,22 +14,22 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 
-public class TokenVerify {
+public class JwtTokenVerify {
 
-	private static volatile TokenVerify INSTANCE = null;
+	private static volatile JwtTokenVerify INSTANCE = null;
 	private static String RSA_ALGORITHM = "RSA";
 
-	private TokenVerify() {
+	private JwtTokenVerify() {
 		if (INSTANCE != null) {
 			throw new RuntimeException("Already initial.");
 		}
 	}
 
-	public static TokenVerify getInstance() {
+	public static JwtTokenVerify getInstance() {
 		if (INSTANCE == null) {
-			synchronized (TokenVerify.class) {
+			synchronized (JwtTokenVerify.class) {
 				if (INSTANCE == null) {
-					INSTANCE = new TokenVerify();
+					INSTANCE = new JwtTokenVerify();
 				}
 			}
 		}

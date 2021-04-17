@@ -18,6 +18,7 @@ import java.util.Comparator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -92,6 +93,15 @@ public class TestGenerateKeyPair {
 				Base64.getEncoder().encodeToString(rsaPrivateKey.getEncoded()));
 		log.info("{}. RSA public key:\n{}\n", SignatureAlgorithm.RS256,
 				Base64.getEncoder().encodeToString(rsaPublicKey.getEncoded()));
+	}
+
+	@Test
+	public void testGenerateSecretKeyAndSalt() {
+		log.info("---------- Test generate secret key and salt ----------");
+		String base64SecretKey = Base64.getEncoder().encodeToString(KeyGenerators.secureRandom(128).generateKey());
+		log.info("Base64 Secretkey: {}", base64SecretKey);
+		String salt = KeyGenerators.string().generateKey();
+		log.info("HEX salt: {}", salt);
 	}
 
 }

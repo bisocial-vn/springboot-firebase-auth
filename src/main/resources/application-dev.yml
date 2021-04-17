@@ -31,10 +31,16 @@ server:
 
 app:
   jwt:
-    privatekeyPath: ${JWT_PRIVATEKEY_PATH}
-    publickey: ${JWT_PUBLICKEY}
+    privatekeyPath: ${JWT_PRIVATEKEY_PATH:classpath:.secret/privatekey-test}
+    publickey: ${JWT_PUBLICKEY:MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgj3NAJDBF7aMunLlOonzY13FbPrURlmDZHMykWgElqKOVapLL6jWaQJnXkDWHFmedIBSRs7BMF924yl5Xg96CUEgEuGN9jzja8e7BiUZ/8vifZYCNCcGf2bCqbKOfPh1FYLTPCENchEbb1S8rN0Ruc4ebt4aq6EXE0rKkhr52KdaEvqyUIyMcnNhYJuGYrVdQ/fl9VIR27R9XCJKchUMm1Rv9c1ormiF3DrC7N/LN18f0wdspBclV6kI8IvQ1Gas/3wAztWvvrrnmBOuEqtmjkhEzOXEVjJQktsdo/Y7kRipH5R6rJ1CCd24OZggZz1lxOr2JqlgBqatbrSIvQauHQIDAQAB}
     accessTokenDuration: 1d
     refreshTokenDuration : 30d
+    refreshTokenKey: ${JWT_REFRESH_TOKEN_KEY:9T1iaIjFfIvfK/akOunpq5dOcwAgotdU9OkVDlEkjGPd/aLgv8rnH+NBM3vNuBwUSMWGpzeyxrrR5nN4kiOANHFsi6VisdkHco6l3y7otJ+94+VplbL4b7pmBRWMoHU50DowQ0FVsLhzVWZhSjtIQAjvxoYgNZfUnqMomgYoBHY=}
+    refreshTokenSalt: ${JWT_REFRESH_TOKEN_SALT:cd7bf67ccb179924}
+    header: Authorization
+    type: Bearer
   firebase:
     credential:
-      path: ${APP_FIREBASE_CREDENTIAL_PATH}
+      path: ${APP_FIREBASE_CREDENTIAL_PATH:classpath:.secret/firebase-config.json}
+      
+      

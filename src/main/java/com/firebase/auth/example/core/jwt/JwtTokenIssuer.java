@@ -10,21 +10,21 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-public class TokenIssuer {
+public class JwtTokenIssuer {
 
-	private static volatile TokenIssuer INSTANCE = null;
+	private static volatile JwtTokenIssuer INSTANCE = null;
 
-	private TokenIssuer() {
+	private JwtTokenIssuer() {
 		if (INSTANCE != null) {
 			throw new RuntimeException("Already initial.");
 		}
 	}
 
-	public static TokenIssuer getInstance() {
+	public static JwtTokenIssuer getInstance() {
 		if (INSTANCE == null) {
-			synchronized (TokenIssuer.class) {
+			synchronized (JwtTokenIssuer.class) {
 				if (INSTANCE == null) {
-					INSTANCE = new TokenIssuer();
+					INSTANCE = new JwtTokenIssuer();
 				}
 			}
 		}

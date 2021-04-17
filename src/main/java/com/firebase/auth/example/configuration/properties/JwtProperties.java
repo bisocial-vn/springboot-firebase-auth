@@ -15,5 +15,9 @@ public class JwtProperties {
 	private Duration accessTokenDuration = Duration.ofDays(1l);
 	private Duration refreshTokenDuration = Duration.ofDays(30l);
 	private String publickey;
+	private String privatekeyPath;
+	private String header;
+	private String type;
+	private String refreshTokenKey;
 
 }
