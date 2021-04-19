@@ -16,8 +16,12 @@ import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Comparator;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -77,6 +81,27 @@ public class TestGenerateKeyPair {
 			assertFalse(Files.exists(tmpFolderPath));
 
 		}
+	}
+
+	@Test
+	@DisplayName("testGenerateKeyPairForJwtToken")
+	public void testGenerateKeyPairForJwtToken() {
+		KeyPair rsa256KeyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
+		PublicKey rsaPublicKey = rsa256KeyPair.getPublic();
+		PrivateKey rsaPrivateKey = rsa256KeyPair.getPrivate();
+		log.info("{}. RSA private key: \n{}\n", SignatureAlgorithm.RS256,
+				Base64.getEncoder().encodeToString(rsaPrivateKey.getEncoded()));
+		log.info("{}. RSA public key:\n{}\n", SignatureAlgorithm.RS256,
+				Base64.getEncoder().encodeToString(rsaPublicKey.getEncoded()));
+	}
+
+	@Test
+	public void testGenerateSecretKeyAndSalt() {
+		log.info("---------- Test generate secret key and salt ----------");
+		String base64SecretKey = Base64.getEncoder().encodeToString(KeyGenerators.secureRandom(128).generateKey());
+		log.info("Base64 Secretkey: {}", base64SecretKey);
+		String salt = KeyGenerators.string().generateKey();
+		log.info("HEX salt: {}", salt);
 	}
 
 }

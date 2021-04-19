@@ -1,11 +1,11 @@
-version: '3.1'
+version: "3.1"
 services:
   rest-service:
-    image: fb-be
-    ports: 
+    image: firebase-auth-be-test:0.0.1-SNAPSHOT
+    ports:
       - "8080:8080"
     volumes:
-      - ./fir-auth-test-be3bb-firebase-adminsdk-h43gm-2d8167fd8a.json:/.secret/firebase-key.json
+      - ../fir-auth-test-be3bb-firebase-adminsdk-h43gm-2d8167fd8a.json:/.secret/firebase-key.json
     environment:
       - APP_FIREBASE_CREDENTIAL_PATH=/.secret/firebase-key.json
       - GOOGLE_APPLICATION_CREDENTIALS=/.secret/firebase-key.json

@@ -1,9 +1,8 @@
 package com.firebase.auth.example.service;
 
-public class AccountService {
+import com.firebase.auth.example.dto.request.RegisterAccountRequest;
+import com.firebase.auth.example.entity.AccountEntity;
 
-	public AccountService() {
-		super();
-	}
-
+public interface AccountService {
+	AccountEntity createAccount(RegisterAccountRequest accountRequest) throws Exception;
 }

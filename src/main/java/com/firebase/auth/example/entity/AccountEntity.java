@@ -15,7 +15,7 @@ public class AccountEntity {
 
 	@Id
 	@GeneratedValue
-	private long id;
+	private Long id;
 
 	@Column(unique = true, name = "EMAIL")
 	private String email;

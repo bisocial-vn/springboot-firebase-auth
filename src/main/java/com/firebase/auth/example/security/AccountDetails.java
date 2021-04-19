@@ -1,10 +1,12 @@
 package com.firebase.auth.example.security;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.firebase.auth.example.entity.AccountEntity;
 
 public class AccountDetails implements UserDetails {
@@ -17,6 +19,10 @@ public class AccountDetails implements UserDetails {
 		this.accountEntity = accountEntity;
 	}
 
+	public Long getAccountId() {
+		return accountEntity.getId();
+	}
+
 	public String getEmail() {
 		return accountEntity.getEmail();
 	}
@@ -27,10 +33,11 @@ public class AccountDetails implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+		return new ArrayList<GrantedAuthority>();
 	}
 
 	@Override
+	@JsonIgnoreProperties
 	public String getPassword() {
 		return accountEntity.getPassword();
 	}

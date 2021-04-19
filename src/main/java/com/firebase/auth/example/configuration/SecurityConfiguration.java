@@ -7,34 +7,59 @@ import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.firebase.auth.example.configuration.properties.JwtProperties;
 import com.firebase.auth.example.constant.CommonConstant;
 import com.firebase.auth.example.security.AccountDetailsService;
+import com.firebase.auth.example.security.FobiddenHiddenHandler;
+import com.firebase.auth.example.security.JwtTokenAuthenticationProcessingFilter;
+import com.firebase.auth.example.security.NoRedirectStrategy;
+import com.firebase.auth.example.security.UnauthenticationHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	private AccountDetailsService accountDetailsService;
+	private UnauthenticationHandler unauthenticationHandler;
+	private FobiddenHiddenHandler fobiddenHiddenHandler;
+	private JwtProperties jwtProperties;
 
-	public SecurityConfiguration(AccountDetailsService accountDetailsService) {
-//		super(true);
+	public SecurityConfiguration(AccountDetailsService accountDetailsService,
+			UnauthenticationHandler unauthenticationHandler, FobiddenHiddenHandler fobiddenHiddenHandler,
+			JwtProperties jwtProperties) {
+		super(true);
 		this.accountDetailsService = accountDetailsService;
+		this.unauthenticationHandler = unauthenticationHandler;
+		this.fobiddenHiddenHandler = fobiddenHiddenHandler;
+		this.jwtProperties = jwtProperties;
+	}
+
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
 	}
 
 	@Override
@@ -45,9 +70,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.logout().disable();
 		http.cors(Customizer.withDefaults());
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//		http.exceptionHandling().defaultAuthenticationEntryPointFor(, CommonConstant.PROTECTED_URLS)
+		http.exceptionHandling().defaultAuthenticationEntryPointFor(unauthenticationHandler,
+				CommonConstant.PROTECTED_URLS);
+		http.exceptionHandling().defaultAccessDeniedHandlerFor(fobiddenHiddenHandler, CommonConstant.PROTECTED_URLS);
+		http.authorizeRequests().requestMatchers(CommonConstant.PUBLIC_URLS).permitAll();
 		http.authorizeRequests().requestMatchers(CommonConstant.PROTECTED_URLS).authenticated();
 		http.authorizeRequests().antMatchers("/h2-ui/**").permitAll();
+		http.authorizeRequests().antMatchers("/actuator/**").permitAll();
+		http.addFilterBefore(jwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
 		http.headers().frameOptions().sameOrigin();
 	}
 
@@ -56,9 +86,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		web.ignoring().requestMatchers(CommonConstant.PUBLIC_URLS);
 	}
 
+	@Bean
+	public DaoAuthenticationProvider configDaoAuthenticationProvider() {
+		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+		daoAuthenticationProvider.setUserDetailsService(accountDetailsService);
+		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+		return daoAuthenticationProvider;
+	}
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(accountDetailsService).passwordEncoder(passwordEncoder());
+		auth.authenticationProvider(configDaoAuthenticationProvider());
 	}
 
 	@Bean
@@ -85,6 +123,27 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		source.registerCorsConfiguration("/**", configuration);
 		// TODO add cors config for auth / PROTECTED_URLS
 		return source;
+	}
+
+	@Bean
+	GrantedAuthorityDefaults grantedAuthorityDefaults() {
+		return new GrantedAuthorityDefaults(""); // Remove the ROLE_ prefix
+	}
+
+	@Bean
+	SimpleUrlAuthenticationSuccessHandler successHandler() {
+		final SimpleUrlAuthenticationSuccessHandler successHandler = new SimpleUrlAuthenticationSuccessHandler();
+		successHandler.setRedirectStrategy(new NoRedirectStrategy());
+		return successHandler;
+	}
+
+	@Bean
+	JwtTokenAuthenticationProcessingFilter jwtTokenAuthenticationProcessingFilter() throws Exception {
+		final JwtTokenAuthenticationProcessingFilter filter = new JwtTokenAuthenticationProcessingFilter(
+				CommonConstant.PROTECTED_URLS, jwtProperties);
+		filter.setAuthenticationManager(this.authenticationManager());
+		filter.setAuthenticationSuccessHandler(successHandler());
+		return filter;
 	}
 
 }

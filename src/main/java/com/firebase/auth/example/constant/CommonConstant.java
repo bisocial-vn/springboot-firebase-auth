@@ -17,4 +17,9 @@ public class CommonConstant {
 	public static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 	public static final String VIETNAM_REGION_CODE = "VN";
 
+	public static final String DEFAULT_RSA_ALGORITHM = "RSA";
+	public static final String DEFAULT_REFRESH_TOKEN_KEY = "__rftk";
+	public static final String JWT_AUTHORZIED_KEY = "roles";
+	public static final String JWT_SUBJECT_KEY = "sub";
+
 }
