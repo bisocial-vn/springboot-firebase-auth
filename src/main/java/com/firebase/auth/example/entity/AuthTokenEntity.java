@@ -5,7 +5,8 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class AuthTokenEntity extends BasicEntityAudit {
 	private String refreshToken;
 	private Date expiryDate;
-	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "account_id", nullable = false)
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "acc_id")
 	private AccountEntity account;
 }

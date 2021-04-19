@@ -9,11 +9,11 @@
 		<version>2.4.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>firebase-auth-be-test</groupId>
-	<artifactId>firebase-auth-be-test</artifactId>
+	<groupId>springboot-firebase-auth</groupId>
+	<artifactId>springboot-firebase-auth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>firebase-auth-be-test</name>
-	<description>Firebase auth test server</description>
+	<name>springboot-firebase-auth</name>
+	<description>SpringBoot Firebase auth test server</description>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>

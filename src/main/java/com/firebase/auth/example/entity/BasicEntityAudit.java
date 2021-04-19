@@ -20,7 +20,7 @@ import lombok.EqualsAndHashCode;
 @EntityListeners(AuditingEntityListener.class)
 public class BasicEntityAudit extends AbstractPersistable<Long> {
 
-	@Column(name = "CREATED_DATE", nullable = false, updatable = false)
+	@Column(name = "CREATED_DATE", updatable = false)
 	@CreatedDate
 	private Date createdDate;
 
