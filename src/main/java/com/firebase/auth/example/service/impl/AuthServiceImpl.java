@@ -1,6 +1,7 @@
 package com.firebase.auth.example.service.impl;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,10 @@ import com.firebase.auth.example.service.AuthService;
 import com.firebase.auth.example.service.CipherService;
 import com.firebase.auth.example.service.TokenService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
 	private AuthenticationManager authenticationManager;
@@ -59,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 		AccountDetails accountDetails = (AccountDetails) authenticated.getPrincipal();
 		Map<String, Object> claims = new HashMap<>();
-		claims.put("roles", accountDetails.getAuthorities());
+		claims.put("roles", accountDetails.getAuthorities().toString());
 		Instant now = Instant.now();
 		Instant accessTokenExpiryDate = now.plus(jwtProperties.getAccessTokenDuration());
 		String accessToken = this.tokenService.generateToken(String.valueOf(accountDetails.getAccountId()), claims);
@@ -77,9 +81,16 @@ public class AuthServiceImpl implements AuthService {
 		return tokenResponse;
 	}
 
+	private void saveRefreshToken(String uuid, Date expiryDate, Long accountId) {
+		AccountEntity accountEntity = new AccountEntity();
+		accountEntity.setId(accountId);
+		AuthTokenEntity authTokenEntity = new AuthTokenEntity(uuid, expiryDate, accountEntity);
+		authTokenRepository.save(authTokenEntity);
+	}
+
 	@Override
-	public TokenResponse authentiationWithRefreshToken(String refreshTokenEncrypted) throws Exception {
-		String decryptedRefreshToken = cipherService.decryptText(refreshTokenEncrypted);
+	public TokenResponse authentiationWithRefreshToken(String encryptedRefreshToken) throws Exception {
+		String decryptedRefreshToken = cipherService.decryptText(encryptedRefreshToken);
 		if (!StringUtils.hasText(decryptedRefreshToken)) {
 			throw new Exception("Invalid refreshToken.");
 		}
@@ -88,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
 			throw new Exception("Invalid refreshToken. Token not found or expired.");
 		}
 		Map<String, Object> claims = new HashMap<>();
-		claims.put("roles", "ROLE_USER");
+		claims.put("roles", Collections.singleton("USER"));
 		Instant now = Instant.now();
 		Instant accessTokenExpiryDate = now.plus(jwtProperties.getAccessTokenDuration());
 		String accessToken = this.tokenService.generateToken(String.valueOf(authTokenEntity.get().getAccount().getId()),
@@ -100,11 +111,27 @@ public class AuthServiceImpl implements AuthService {
 		return tokenResponse;
 	}
 
-	private void saveRefreshToken(String uuid, Date expiryDate, Long accountId) {
-		AccountEntity accountEntity = new AccountEntity();
-		accountEntity.setId(accountId);
-		AuthTokenEntity authTokenEntity = new AuthTokenEntity(uuid, expiryDate, accountEntity);
-		authTokenRepository.save(authTokenEntity);
+	@Override
+	public void deleteRefreshToken(String encryptedRefreshToken) {
+		String decryptedRefreshToken = cipherService.decryptText(encryptedRefreshToken);
+		if (!StringUtils.hasText(decryptedRefreshToken)) {
+			throw new RuntimeException("Invalid refreshToken.");
+		}
+		Optional<AuthTokenEntity> authTokenEntity = authTokenRepository.findByRefreshToken(decryptedRefreshToken);
+		if (!authTokenEntity.isPresent()) {
+			throw new RuntimeException("Invalid refreshToken. Token not found or expired.");
+		}
+		authTokenRepository.deleteByRefreshToken(decryptedRefreshToken);
+
+	}
+
+	@Override
+	public void deleteAllAccountRefreshToken(Long accountId) {
+		if (accountId == null) {
+			throw new IllegalArgumentException("Invalid AccountId: " + accountId);
+		}
+		int affectedRow = authTokenRepository.deleteByAccountId(accountId);
+		log.debug("Delete {} refreshToken belong to Account with ID: {}.", affectedRow, accountId);
 	}
 
 }

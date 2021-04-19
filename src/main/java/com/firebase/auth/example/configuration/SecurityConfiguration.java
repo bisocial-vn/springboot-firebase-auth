@@ -29,10 +29,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.firebase.auth.example.configuration.properties.JwtProperties;
 import com.firebase.auth.example.constant.CommonConstant;
 import com.firebase.auth.example.security.AccountDetailsService;
 import com.firebase.auth.example.security.FobiddenHiddenHandler;
-import com.firebase.auth.example.security.JwtTokenAuthenticationFilter;
+import com.firebase.auth.example.security.JwtTokenAuthenticationProcessingFilter;
 import com.firebase.auth.example.security.NoRedirectStrategy;
 import com.firebase.auth.example.security.UnauthenticationHandler;
 
@@ -43,13 +44,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private AccountDetailsService accountDetailsService;
 	private UnauthenticationHandler unauthenticationHandler;
 	private FobiddenHiddenHandler fobiddenHiddenHandler;
+	private JwtProperties jwtProperties;
 
 	public SecurityConfiguration(AccountDetailsService accountDetailsService,
-			UnauthenticationHandler unauthenticationHandler, FobiddenHiddenHandler fobiddenHiddenHandler) {
+			UnauthenticationHandler unauthenticationHandler, FobiddenHiddenHandler fobiddenHiddenHandler,
+			JwtProperties jwtProperties) {
 		super(true);
 		this.accountDetailsService = accountDetailsService;
 		this.unauthenticationHandler = unauthenticationHandler;
 		this.fobiddenHiddenHandler = fobiddenHiddenHandler;
+		this.jwtProperties = jwtProperties;
 	}
 
 	@Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -72,7 +76,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().requestMatchers(CommonConstant.PUBLIC_URLS).permitAll();
 		http.authorizeRequests().requestMatchers(CommonConstant.PROTECTED_URLS).authenticated();
 		http.authorizeRequests().antMatchers("/h2-ui/**").permitAll();
-		http.addFilterBefore(jwtTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.authorizeRequests().antMatchers("/actuator/**").permitAll();
+		http.addFilterBefore(jwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
 		http.headers().frameOptions().sameOrigin();
 	}
 
@@ -133,8 +138,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter() throws Exception {
-		final JwtTokenAuthenticationFilter filter = new JwtTokenAuthenticationFilter(CommonConstant.PROTECTED_URLS);
+	JwtTokenAuthenticationProcessingFilter jwtTokenAuthenticationProcessingFilter() throws Exception {
+		final JwtTokenAuthenticationProcessingFilter filter = new JwtTokenAuthenticationProcessingFilter(
+				CommonConstant.PROTECTED_URLS, jwtProperties);
 		filter.setAuthenticationManager(this.authenticationManager());
 		filter.setAuthenticationSuccessHandler(successHandler());
 		return filter;
