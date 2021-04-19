@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +14,7 @@ import org.springframework.security.config.BeanIds;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.firebase.auth.example.configuration.properties.JwtProperties;
 import com.firebase.auth.example.dto.response.TokenResponse;
@@ -44,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public TokenResponse authenticationUser(String emailOrPhone, String password, boolean isRemember)
+	public TokenResponse authenticationWithCredential(String emailOrPhone, String password, boolean isRemember)
 			throws AuthenticationException {
 		UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(emailOrPhone,
 				password);
@@ -72,6 +74,29 @@ public class AuthServiceImpl implements AuthService {
 			Instant refreshTokenExpiryDate = now.plus(jwtProperties.getRefreshTokenDuration());
 			this.saveRefreshToken(uuid, Date.from(refreshTokenExpiryDate), accountDetails.getAccountId());
 		}
+		return tokenResponse;
+	}
+
+	@Override
+	public TokenResponse authentiationWithRefreshToken(String refreshTokenEncrypted) throws Exception {
+		String decryptedRefreshToken = cipherService.decryptText(refreshTokenEncrypted);
+		if (!StringUtils.hasText(decryptedRefreshToken)) {
+			throw new Exception("Invalid refreshToken.");
+		}
+		Optional<AuthTokenEntity> authTokenEntity = authTokenRepository.findByRefreshToken(decryptedRefreshToken);
+		if (!authTokenEntity.isPresent()) {
+			throw new Exception("Invalid refreshToken. Token not found or expired.");
+		}
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("roles", "ROLE_USER");
+		Instant now = Instant.now();
+		Instant accessTokenExpiryDate = now.plus(jwtProperties.getAccessTokenDuration());
+		String accessToken = this.tokenService.generateToken(String.valueOf(authTokenEntity.get().getAccount().getId()),
+				claims);
+		TokenResponse tokenResponse = new TokenResponse();
+		tokenResponse.setAccessToken(accessToken);
+		tokenResponse.setType(jwtProperties.getType());
+		tokenResponse.setAccessTokenExpiryDate(Date.from(accessTokenExpiryDate));
 		return tokenResponse;
 	}
 

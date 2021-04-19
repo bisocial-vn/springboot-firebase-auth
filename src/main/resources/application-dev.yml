@@ -1,6 +1,6 @@
 spring:
   application:
-    name: firebase-auth-test
+    name: firebase-auth-dev
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,7 +16,6 @@ spring:
 debug: true
 logging:
   level:
-#    root: debug
     '[org.springframework.beans]': error
     '[org.springframework.web]': debug
     '[org.springframework.transaction]': debug

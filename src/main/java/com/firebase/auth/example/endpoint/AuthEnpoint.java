@@ -7,6 +7,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +31,8 @@ public class AuthEnpoint {
 	private JwtProperties jwtProperties;
 
 	@PostMapping("/public/auth/token")
-	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+	public ResponseEntity<?> loginWithCredential(@Valid @RequestBody LoginRequest loginRequest,
+			HttpServletResponse response) {
 		try {
 			ValidationUtils.getInstance().validateLoginName(loginRequest.getLoginname());
 		} catch (IllegalArgumentException argumentEx) {
@@ -37,7 +41,7 @@ public class AuthEnpoint {
 			ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
 		}
 		try {
-			TokenResponse tokenResponse = authService.authenticationUser(loginRequest.getLoginname(),
+			TokenResponse tokenResponse = authService.authenticationWithCredential(loginRequest.getLoginname(),
 					loginRequest.getPassword(), loginRequest.isRemember());
 			if (loginRequest.isRemember()) {
 				Cookie cookie = new Cookie(CommonConstant.DEFAULT_REFRESH_TOKEN_KEY, tokenResponse.getRefreshToken());
@@ -52,4 +56,19 @@ public class AuthEnpoint {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiErrorResponse);
 		}
 	}
+
+	@GetMapping("/public/auth/token")
+	public ResponseEntity<?> loginWithRefreshToken(
+			@CookieValue(name = CommonConstant.DEFAULT_REFRESH_TOKEN_KEY, defaultValue = "") String encryptedRefreshToken) {
+		if (!StringUtils.hasText(encryptedRefreshToken)) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		try {
+			TokenResponse tokenResponse = authService.authentiationWithRefreshToken(encryptedRefreshToken);
+			return ResponseEntity.ok(tokenResponse);
+		} catch (Exception ex) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+	}
+
 }
