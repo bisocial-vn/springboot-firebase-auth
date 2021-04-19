@@ -9,5 +9,6 @@ public class TokenResponse {
 	private String accessToken;
 	private String refreshToken;
 	private String type;
-	private Date expiryDate;
+	private Date accessTokenExpiryDate;
+	private Date refreshTokenExpiryDate;
 }

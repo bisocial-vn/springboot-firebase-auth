@@ -14,7 +14,7 @@ public class TestEntity {
 
 	@Id
 	@GeneratedValue
-	private long id;
+	private Long id;
 	private String desc;
 
 }

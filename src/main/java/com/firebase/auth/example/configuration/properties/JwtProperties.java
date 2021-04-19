@@ -19,5 +19,6 @@ public class JwtProperties {
 	private String header;
 	private String type;
 	private String refreshTokenKey;
+	private String refreshTokenSalt;
 
 }

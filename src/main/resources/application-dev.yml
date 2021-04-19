@@ -16,7 +16,7 @@ spring:
 debug: true
 logging:
   level:
-    root: info
+#    root: debug
     '[org.springframework.beans]': error
     '[org.springframework.web]': debug
     '[org.springframework.transaction]': debug
@@ -41,6 +41,6 @@ app:
     type: Bearer
   firebase:
     credential:
-      path: ${APP_FIREBASE_CREDENTIAL_PATH:classpath:.secret/firebase-config.json}
+      uri: ${APP_FIREBASE_CREDENTIAL_URI:classpath:.secret/firebase-config.json}
       
       

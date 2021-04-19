@@ -19,7 +19,7 @@ public class AccountDetails implements UserDetails {
 		this.accountEntity = accountEntity;
 	}
 
-	public long getAccountId() {
+	public Long getAccountId() {
 		return accountEntity.getId();
 	}
 

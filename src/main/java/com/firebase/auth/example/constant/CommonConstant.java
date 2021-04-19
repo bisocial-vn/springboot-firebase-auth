@@ -18,5 +18,6 @@ public class CommonConstant {
 	public static final String VIETNAM_REGION_CODE = "VN";
 
 	public static final String DEFAULT_RSA_ALGORITHM = "RSA";
+	public static final String DEFAULT_REFRESH_TOKEN_KEY = "__rftk";
 
 }

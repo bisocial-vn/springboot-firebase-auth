@@ -12,15 +12,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.encrypt.Encryptors;
-import org.springframework.security.crypto.encrypt.TextEncryptor;
-import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
 import com.firebase.auth.example.configuration.properties.JwtProperties;
 import com.firebase.auth.example.dto.response.TokenResponse;
+import com.firebase.auth.example.entity.AccountEntity;
+import com.firebase.auth.example.entity.AuthTokenEntity;
+import com.firebase.auth.example.repository.AuthTokenRepository;
 import com.firebase.auth.example.security.AccountDetails;
 import com.firebase.auth.example.service.AuthService;
+import com.firebase.auth.example.service.CipherService;
 import com.firebase.auth.example.service.TokenService;
 
 @Service
@@ -29,16 +30,21 @@ public class AuthServiceImpl implements AuthService {
 	private AuthenticationManager authenticationManager;
 	private TokenService tokenService;
 	private JwtProperties jwtProperties;
+	private CipherService cipherService;
+	private AuthTokenRepository authTokenRepository;
 
 	public AuthServiceImpl(@Qualifier(BeanIds.AUTHENTICATION_MANAGER) AuthenticationManager authenticationManager,
-			TokenService tokenService, JwtProperties jwtProperties) {
+			TokenService tokenService, JwtProperties jwtProperties, CipherService cipherService,
+			AuthTokenRepository authTokenRepository) {
 		this.authenticationManager = authenticationManager;
 		this.tokenService = tokenService;
 		this.jwtProperties = jwtProperties;
+		this.cipherService = cipherService;
+		this.authTokenRepository = authTokenRepository;
 	}
 
 	@Override
-	public String authenticationUser(String emailOrPhone, String password, boolean isRemember)
+	public TokenResponse authenticationUser(String emailOrPhone, String password, boolean isRemember)
 			throws AuthenticationException {
 		UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(emailOrPhone,
 				password);
@@ -52,29 +58,28 @@ public class AuthServiceImpl implements AuthService {
 		AccountDetails accountDetails = (AccountDetails) authenticated.getPrincipal();
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("roles", accountDetails.getAuthorities());
-		Instant tokenExpiryDate = Instant.now().plus(jwtProperties.getAccessTokenDuration());
+		Instant now = Instant.now();
+		Instant accessTokenExpiryDate = now.plus(jwtProperties.getAccessTokenDuration());
 		String accessToken = this.tokenService.generateToken(String.valueOf(accountDetails.getAccountId()), claims);
 		TokenResponse tokenResponse = new TokenResponse();
 		tokenResponse.setAccessToken(accessToken);
 		tokenResponse.setType(jwtProperties.getType());
-		tokenResponse.setExpiryDate(Date.from(tokenExpiryDate));
+		tokenResponse.setAccessTokenExpiryDate(Date.from(accessTokenExpiryDate));
 		if (isRemember) {
 			String uuid = UUID.randomUUID().toString();
-			String refreshToken = this.encrypt(uuid);
+			String refreshToken = cipherService.encryptText(uuid);
+			tokenResponse.setRefreshToken(refreshToken);
+			Instant refreshTokenExpiryDate = now.plus(jwtProperties.getRefreshTokenDuration());
+			this.saveRefreshToken(uuid, Date.from(refreshTokenExpiryDate), accountDetails.getAccountId());
 		}
-		return UUID.randomUUID().toString();
+		return tokenResponse;
 	}
 
-	private String encrypt(String input) {
-		TextEncryptor textEncryptor = Encryptors.text(jwtProperties.getRefreshTokenKey(),
-				KeyGenerators.string().generateKey());
-		return textEncryptor.encrypt(input);
-	}
-
-	private String decrypt(String input) {
-		TextEncryptor textEncryptor = Encryptors.text(jwtProperties.getRefreshTokenKey(),
-				KeyGenerators.string().generateKey());
-		return textEncryptor.decrypt(input);
+	private void saveRefreshToken(String uuid, Date expiryDate, Long accountId) {
+		AccountEntity accountEntity = new AccountEntity();
+		accountEntity.setId(accountId);
+		AuthTokenEntity authTokenEntity = new AuthTokenEntity(uuid, expiryDate, accountEntity);
+		authTokenRepository.save(authTokenEntity);
 	}
 
 }
