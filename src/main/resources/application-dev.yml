@@ -1,9 +1,8 @@
 spring:
   application:
-    name: springboot-firebase-auth
+    name: springboot-firebase-auth-dev
   datasource:
     url: ${APP_DATASOURCE_URL:jdbc:mysql://localhost:3306/appdb}
-#    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/appdb
     username: appuser
     password: aPpP@Ss
   jpa:

@@ -13,7 +13,7 @@ spring:
   web:
     resources:
       add-mappings: false
-debug: true
+debug: false
 logging:
   level:
     '[org.springframework.beans]': error
