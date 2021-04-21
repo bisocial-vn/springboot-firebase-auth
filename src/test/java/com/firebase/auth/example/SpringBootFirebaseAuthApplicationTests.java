@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class FirebaseAuthBeTestApplicationTests {
+class SpringBootFirebaseAuthApplicationTests {
 
 	@Test
 	void contextLoads() {

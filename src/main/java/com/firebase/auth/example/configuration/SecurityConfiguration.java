@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,14 +29,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.GenericFilterBean;
 
 import com.firebase.auth.example.configuration.properties.JwtProperties;
 import com.firebase.auth.example.constant.CommonConstant;
 import com.firebase.auth.example.security.AccountDetailsService;
 import com.firebase.auth.example.security.FobiddenHiddenHandler;
+import com.firebase.auth.example.security.JwtTokenAuthenticationManager;
 import com.firebase.auth.example.security.JwtTokenAuthenticationProcessingFilter;
 import com.firebase.auth.example.security.NoRedirectStrategy;
 import com.firebase.auth.example.security.UnauthenticationHandler;
+import com.firebase.auth.example.service.TokenService;
 
 @Configuration
 @EnableWebSecurity
@@ -45,15 +49,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private UnauthenticationHandler unauthenticationHandler;
 	private FobiddenHiddenHandler fobiddenHiddenHandler;
 	private JwtProperties jwtProperties;
+	private TokenService tokenService;
 
 	public SecurityConfiguration(AccountDetailsService accountDetailsService,
 			UnauthenticationHandler unauthenticationHandler, FobiddenHiddenHandler fobiddenHiddenHandler,
-			JwtProperties jwtProperties) {
+			JwtProperties jwtProperties, TokenService tokenService) {
 		super(true);
 		this.accountDetailsService = accountDetailsService;
 		this.unauthenticationHandler = unauthenticationHandler;
 		this.fobiddenHiddenHandler = fobiddenHiddenHandler;
 		this.jwtProperties = jwtProperties;
+		this.tokenService = tokenService;
 	}
 
 	@Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -141,9 +147,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	JwtTokenAuthenticationProcessingFilter jwtTokenAuthenticationProcessingFilter() throws Exception {
 		final JwtTokenAuthenticationProcessingFilter filter = new JwtTokenAuthenticationProcessingFilter(
 				CommonConstant.PROTECTED_URLS, jwtProperties);
-		filter.setAuthenticationManager(this.authenticationManager());
+//		filter.setAuthenticationManager(this.authenticationManager());
+		filter.setAuthenticationManager(new JwtTokenAuthenticationManager(tokenService));
 		filter.setAuthenticationSuccessHandler(successHandler());
 		return filter;
+	}
+
+	/**
+	 * Disable Spring boot automatic filter registration.
+	 */
+	@Bean
+	FilterRegistrationBean<GenericFilterBean> disableAutoRegistration(
+			final JwtTokenAuthenticationProcessingFilter tokenFilter) {
+		final FilterRegistrationBean<GenericFilterBean> registration = new FilterRegistrationBean<>(tokenFilter);
+		registration.setEnabled(false);
+		return registration;
 	}
 
 }

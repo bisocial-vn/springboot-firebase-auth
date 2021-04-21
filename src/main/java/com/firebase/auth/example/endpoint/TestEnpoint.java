@@ -1,5 +1,6 @@
 package com.firebase.auth.example.endpoint;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class TestEnpoint {
 	public ResponseEntity<?> ping() {
 		Map<String, Object> body = new HashMap<String, Object>();
 		body.put("ping", "pong");
+		body.put("date", new Date());
 		return ResponseEntity.ok(body);
 	}
 }

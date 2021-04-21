@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active:
-    - prod
   jpa:
     hibernate:
       ddl-auto: validate
@@ -11,11 +8,10 @@ spring:
       add-mappings: false
 server:
   error:
-    path: /public/error
     whitelabel:
       enabled: false
-      
+      jpa:
 app:
   firebase:
     credential:
-      path: ${APP_FIREBASE_CREDENTIAL_URI}
+      path: ${APP_FIREBASE_CREDENTIAL_PATH}

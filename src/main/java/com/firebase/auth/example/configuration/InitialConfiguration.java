@@ -1,5 +1,6 @@
 package com.firebase.auth.example.configuration;
 
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
@@ -28,7 +29,8 @@ public class InitialConfiguration implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) throws Exception {
 		TestEntity testEntity1 = new TestEntity();
-		testEntity1.setDesc(UUID.randomUUID().toString());
+		testEntity1.setDesception(UUID.randomUUID().toString());
+		testEntity1.setTestDate(new Date());
 		entityManager.persist(testEntity1);
 		log.info(testEntity1.toString());
 		log.info(jwtConfig.toString());

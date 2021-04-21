@@ -17,9 +17,11 @@ import org.springframework.web.context.request.WebRequest;
 @RestController
 public class FallbackErrorHandler implements ErrorController {
 
-	private static final String DEFAULT_ERROR_PATH = "/error";
+	private static final String DEFAULT_ERROR_PATH = "/public/error";
 	private ErrorAttributes errorAttributes;
 
+	@Value("${server.error.path:/public/error}")
+	private String errorPath;
 	@Value("${debug:false}")
 	private boolean isDebug = false;
 
@@ -29,7 +31,7 @@ public class FallbackErrorHandler implements ErrorController {
 
 	@Override
 	public String getErrorPath() {
-		return DEFAULT_ERROR_PATH;
+		return errorPath;
 	}
 
 	@RequestMapping(DEFAULT_ERROR_PATH)
