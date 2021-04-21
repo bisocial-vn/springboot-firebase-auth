@@ -7,6 +7,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,13 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.firebase.auth.example.configuration.properties.JwtProperties;
 import com.firebase.auth.example.constant.CommonConstant;
+import com.firebase.auth.example.dto.JwtTokenPrincipal;
 import com.firebase.auth.example.dto.request.LoginRequest;
 import com.firebase.auth.example.dto.response.BaseApiErrorResponse;
 import com.firebase.auth.example.dto.response.TokenResponse;
 import com.firebase.auth.example.service.AuthService;
 import com.firebase.auth.example.utils.ValidationUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
+@Slf4j
 public class AuthEnpoint {
 
 	@Autowired
@@ -48,6 +54,7 @@ public class AuthEnpoint {
 				cookie.setPath("/");
 				cookie.setHttpOnly(true);
 				cookie.setMaxAge((int) jwtProperties.getRefreshTokenDuration().getSeconds());
+				response.addCookie(cookie);
 			}
 			return ResponseEntity.ok(tokenResponse);
 		} catch (RuntimeException authEx) {
@@ -69,6 +76,48 @@ public class AuthEnpoint {
 		} catch (Exception ex) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
+	}
+
+	@GetMapping("/auth/info")
+	public ResponseEntity<?> getAuthInfo() {
+		Authentication authen = SecurityContextHolder.getContext().getAuthentication();
+		if (authen == null || !JwtTokenPrincipal.class.isInstance(authen.getPrincipal())) {
+			log.debug("Principal is not typeof JwtTokenPrincipal: {}", authen.getPrincipal());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		JwtTokenPrincipal jwtTokenPrincipal = (JwtTokenPrincipal) authen.getPrincipal();
+		return ResponseEntity.ok(jwtTokenPrincipal);
+	}
+
+	@GetMapping("/logout")
+	public ResponseEntity<?> logout(
+			@CookieValue(name = CommonConstant.DEFAULT_REFRESH_TOKEN_KEY, defaultValue = "") String encryptedRefreshToken,
+			HttpServletResponse response) {
+		Cookie refreshTokenCookie = new Cookie(CommonConstant.DEFAULT_REFRESH_TOKEN_KEY, null);
+		refreshTokenCookie.setMaxAge(0);
+		response.addCookie(refreshTokenCookie);
+		if (!StringUtils.hasText(encryptedRefreshToken)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		try {
+			authService.deleteRefreshToken(encryptedRefreshToken);
+		} catch (Exception ex) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@GetMapping("/logout/all")
+	public ResponseEntity<?> logoutAll() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !JwtTokenPrincipal.class.isInstance(authentication.getPrincipal())) {
+			log.debug("Can not get authentication principal: {}", authentication);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		JwtTokenPrincipal jwtTokenPrincipal = (JwtTokenPrincipal) authentication.getPrincipal();
+		Long accId = Long.valueOf(jwtTokenPrincipal.getAccId());
+		authService.deleteAllAccountRefreshToken(accId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 }

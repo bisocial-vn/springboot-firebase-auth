@@ -11,10 +11,11 @@ spring:
       add-mappings: false
 server:
   error:
+    path: /public/error
     whitelabel:
       enabled: false
-      jpa:
+      
 app:
   firebase:
     credential:
-      path: ${APP_FIREBASE_CREDENTIAL_PATH}
+      path: ${APP_FIREBASE_CREDENTIAL_URI}

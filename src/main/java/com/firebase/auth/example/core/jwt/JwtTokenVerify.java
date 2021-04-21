@@ -45,8 +45,10 @@ public class JwtTokenVerify {
 		try {
 			Jws<Claims> jwtClaims = jwtParserBuilder.build().parseClaimsJws(verifyingToken);
 			Claims bodyPayload = jwtClaims.getBody();
+			String subject = bodyPayload.getSubject();
 			Set<Entry<String, Object>> allClaims = bodyPayload.entrySet();
 			HashMap<String, Object> claimsMap = new HashMap<String, Object>();
+			claimsMap.put("sub", subject);
 			if (!allClaims.isEmpty()) {
 				for (Entry<String, Object> entry : allClaims) {
 					claimsMap.put(entry.getKey(), entry.getValue());

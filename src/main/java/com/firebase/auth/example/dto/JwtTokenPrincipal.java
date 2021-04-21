@@ -13,5 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JwtTokenPrincipal {
 	private String subject;
+	private Long accId;
 	private Collection<GrantedAuthority> roles;
 }
