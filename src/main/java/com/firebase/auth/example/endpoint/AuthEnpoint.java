@@ -64,7 +64,7 @@ public class AuthEnpoint {
 		}
 	}
 
-	@GetMapping("/public/auth/token")
+	@GetMapping("/public/auth/refresh")
 	public ResponseEntity<?> loginWithRefreshToken(
 			@CookieValue(name = CommonConstant.DEFAULT_REFRESH_TOKEN_KEY, defaultValue = "") String encryptedRefreshToken) {
 		if (!StringUtils.hasText(encryptedRefreshToken)) {

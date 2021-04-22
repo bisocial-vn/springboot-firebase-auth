@@ -59,7 +59,6 @@ public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticati
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
-		// TODO Auto-generated method stub
 		super.successfulAuthentication(request, response, chain, authResult);
 		chain.doFilter(request, response);
 	}
@@ -67,9 +66,7 @@ public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticati
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException failed) throws IOException, ServletException {
-		// TODO Auto-generated method stub
 		super.unsuccessfulAuthentication(request, response, failed);
-		response.sendError(HttpStatus.SC_UNAUTHORIZED, "Invalid token. Unauthentication.");
 	}
 
 	private String getJwtTokenFromRequest(HttpServletRequest request) {

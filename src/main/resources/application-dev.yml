@@ -2,7 +2,7 @@ spring:
   application:
     name: springboot-firebase-auth-dev
   datasource:
-    url: ${APP_DATASOURCE_URL:jdbc:mysql://localhost:3306/dev-db}
+    url: ${APP_DATASOURCE_URL:jdbc:mysql://localhost:33061/dev-db}
     username: appuser
     password: aPPp@Ss
   jpa:
@@ -45,5 +45,12 @@ app:
   firebase:
     credential:
       uri: ${APP_FIREBASE_CREDENTIAL_URI:classpath:.secret/firebase-config.json}
+  api:
+    allowCorsDomains: 
+      - http://localhost
+      - http://localhost:3000
+      - https://fir-auth-test-be3bb.web.app
+      - https://fir-auth-test-be3bb.firebaseapp.com
+  
       
       

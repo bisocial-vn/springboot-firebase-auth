@@ -42,11 +42,11 @@ public class JwtTokenIssuer {
 		Instant now = Instant.now();
 		Instant expirationDate = now.plusMillis(durationInMs);
 		JwtBuilder jwtIssuerBuild = Jwts.builder();
-		if (subject != null && subject.length() > 0) {
-			jwtIssuerBuild.setSubject(subject);
-		}
 		if (payload != null && !payload.isEmpty()) {
 			jwtIssuerBuild.setClaims(payload);
+		}
+		if (subject != null && subject.length() > 0) {
+			jwtIssuerBuild.setSubject(subject);
 		}
 		jwtIssuerBuild.setIssuedAt(Date.from(now)).setExpiration(Date.from(expirationDate));
 		jwtIssuerBuild.signWith(privateKey, SignatureAlgorithm.RS256);
