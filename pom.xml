@@ -9,11 +9,11 @@
 		<version>2.4.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>springboot-firebase-auth</groupId>
+	<groupId>com.bi.firebase.auth.example</groupId>
 	<artifactId>springboot-firebase-auth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>springboot-firebase-auth</name>
-	<description>SpringBoot Firebase auth test server</description>
+	<description>SpringBoot Firebase auth example</description>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
@@ -107,5 +107,13 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/bisocial-vn/springboot-firebase-auth</url>
+		</repository>
+	</distributionManagement>
 
 </project>
