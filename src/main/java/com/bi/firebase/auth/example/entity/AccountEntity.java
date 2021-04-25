@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity(name = "Account")
-@Table(name = "ACCOUNT")
+@Table(name = "accounts")
 @Data
 public class AccountEntity {
 
@@ -17,10 +17,11 @@ public class AccountEntity {
 	@GeneratedValue
 	private Long id;
 
-	@Column(unique = true, name = "EMAIL")
+	@Column(unique = true, name = "email")
 	private String email;
-	@Column(unique = true, name = "PHONE")
+	@Column(unique = true, name = "phone")
 	private String phone;
-	@Column(name = "PASSWORD", nullable = false)
+	@Column(name = "password", nullable = false)
 	private String password;
+	private String firebaseUid;
 }

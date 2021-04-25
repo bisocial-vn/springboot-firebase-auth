@@ -57,7 +57,7 @@ public class ValidationUtils {
 		}
 	}
 
-	public boolean isValidEmail(String email) {
+	public boolean isValidEmailFormat(String email) {
 		return this.isMatchPattern(CommonConstant.EMAIL_PATTERN, email);
 	}
 
@@ -66,7 +66,7 @@ public class ValidationUtils {
 			throw new IllegalArgumentException("Login name is required.");
 		}
 		if (loginname.contains(CommonConstant.EMAIL_SIGN)) {
-			if (!this.isValidEmail(loginname)) {
+			if (!this.isValidEmailFormat(loginname)) {
 				throw new IllegalArgumentException("Invalid email format.");
 			}
 			return;
@@ -81,7 +81,7 @@ public class ValidationUtils {
 			throw new IllegalArgumentException("Password is required.");
 		}
 		if (password.length() < 6) {
-			throw new IllegalArgumentException("Password atlest 6 char.");
+			throw new IllegalArgumentException("Password must at lest 6 char long.");
 		}
 	}
 

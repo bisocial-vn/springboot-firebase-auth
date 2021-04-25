@@ -59,31 +59,42 @@ public class AuthServiceImpl implements AuthService {
 		UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(emailOrPhone,
 				password);
 		Authentication authenticated = this.authenticationManager.authenticate(loginToken);
-//		if (authenticated.getAuthorities() == null || authenticated.getAuthorities().isEmpty()) {
-//			throw new RuntimeException("Access denied. Empty role.");
-//		}
+		// if (authenticated.getAuthorities() == null ||
+		// authenticated.getAuthorities().isEmpty()) {
+		// throw new RuntimeException("Access denied. Empty role.");
+		// }
 		if (!AccountDetails.class.isInstance(authenticated.getPrincipal())) {
 			throw new RuntimeException("Can not get authentication details.");
 		}
 		AccountDetails accountDetails = (AccountDetails) authenticated.getPrincipal();
+		Long accountId = accountDetails.getAccountId();
 		Collection<String> roleAsStr = accountDetails.getAuthorities().parallelStream()
 				.map((grantAuthor) -> grantAuthor.getAuthority()).collect(Collectors.toSet());
 		Map<String, Object> claims = new HashMap<>();
-		claims.put("roles", roleAsStr);
-		claims.put("accId", accountDetails.getAccountId());
+		if (roleAsStr != null && !roleAsStr.isEmpty()) {
+			claims.put("roles", roleAsStr);
+		}
+		claims.put("accId", accountId);
+		TokenResponse tokenResponse = issueNewToken(String.valueOf(accountId), claims, isRemember);
+		return tokenResponse;
+	}
+
+	@Override
+	public TokenResponse issueNewToken(String subject, Map<String, Object> claims, boolean isRefresh) {
 		Instant now = Instant.now();
 		Instant accessTokenExpiryDate = now.plus(jwtProperties.getAccessTokenDuration());
-		String accessToken = this.tokenService.generateToken(String.valueOf(accountDetails.getAccountId()), claims);
+		String accessToken = this.tokenService.generateToken(subject, claims);
 		TokenResponse tokenResponse = new TokenResponse();
 		tokenResponse.setAccessToken(accessToken);
 		tokenResponse.setType(jwtProperties.getType());
 		tokenResponse.setAccessTokenExpiryDate(Date.from(accessTokenExpiryDate));
-		if (isRemember) {
+		if (isRefresh) {
 			String uuid = UUID.randomUUID().toString();
 			String refreshToken = cipherService.encryptText(uuid);
 			tokenResponse.setRefreshToken(refreshToken);
 			Instant refreshTokenExpiryDate = now.plus(jwtProperties.getRefreshTokenDuration());
-			this.saveRefreshToken(uuid, Date.from(refreshTokenExpiryDate), accountDetails.getAccountId());
+			tokenResponse.setRefreshTokenExpiryDate(Date.from(refreshTokenExpiryDate));
+			this.saveRefreshToken(uuid, Date.from(refreshTokenExpiryDate), Long.valueOf(subject));
 		}
 		return tokenResponse;
 	}

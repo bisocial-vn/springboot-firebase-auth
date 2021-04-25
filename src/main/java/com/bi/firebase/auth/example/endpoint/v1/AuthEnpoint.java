@@ -1,4 +1,4 @@
-package com.bi.firebase.auth.example.endpoint;
+package com.bi.firebase.auth.example.endpoint.v1;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

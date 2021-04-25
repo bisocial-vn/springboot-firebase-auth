@@ -14,6 +14,8 @@ public class CommonConstant {
 
 	public static final String EMAIL_SIGN = "@";
 	public static final String EMAIL_REGEX = "^((?!\\.)[\\w-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$";
+	public static final String EMAIL_REGEX_SIMPLE = "^[^@]+@[^@]+$";
+
 	public static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 	public static final String VIETNAM_REGION_CODE = "VN";
 

@@ -31,7 +31,7 @@ public class JwtTokenIssuer {
 		return INSTANCE;
 	}
 
-	public String issuanceToken(PrivateKey privateKey, String subject, long durationInMs, Map<String, Object> payload)
+	public String issueToken(PrivateKey privateKey, String subject, long durationInMs, Map<String, Object> payload)
 			throws RuntimeException {
 		if (privateKey == null || privateKey.getEncoded().length < 256l) {
 			throw new RuntimeException("Invalid private key. Private key length must atlest 2048 bit.");

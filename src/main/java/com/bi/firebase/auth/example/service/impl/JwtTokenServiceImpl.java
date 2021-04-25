@@ -50,7 +50,7 @@ public class JwtTokenServiceImpl implements TokenService {
 
 	@Override
 	public String generateToken(String subject, Map<String, Object> claims) {
-		return JwtTokenIssuer.getInstance().issuanceToken(privateKey, subject,
+		return JwtTokenIssuer.getInstance().issueToken(privateKey, subject,
 				jwtProperties.getAccessTokenDuration().toMillis(), claims);
 	}
 
