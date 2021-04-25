@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity(name = "AuthToken")
+@Table(name = "auth_tokens")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

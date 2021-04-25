@@ -7,8 +7,8 @@ services:
     volumes:
       - ../.secrets/firebase-key.json:/.secrets/firebase-key.json
     environment:
-      - APP_FIREBASE_CREDENTIAL_PATH=/.secret/firebase-key.json
-      - GOOGLE_APPLICATION_CREDENTIALS=/.secret/firebase-key.json
+      - APP_FIREBASE_CREDENTIAL_URI=file:/.secrets/firebase-key.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/.secrets/firebase-key.json
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:33061/dev-db
       - SPRING_DATASOURCE_USERNAME=appuser
       - SPRING_DATASOURCE_PASSWORD=aPPp@Ss
