@@ -5,10 +5,10 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ../.secrets/firebase-key.json:/.secrets/firebase-key.json
+      - ../.secrets/firebase-config.json:/.secrets/firebase-config.json
     environment:
-      - APP_FIREBASE_CREDENTIAL_URI=file:/.secrets/firebase-key.json
-      - GOOGLE_APPLICATION_CREDENTIALS=/.secrets/firebase-key.json
+      - APP_FIREBASE_CREDENTIAL_URI=file:/.secrets/firebase-config.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/.secrets/firebase-config.json
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:33061/dev-db
       - SPRING_DATASOURCE_USERNAME=appuser
       - SPRING_DATASOURCE_PASSWORD=aPPp@Ss

@@ -10,7 +10,6 @@ server:
   error:
     whitelabel:
       enabled: false
-      jpa:
 app:
   firebase:
     credential:

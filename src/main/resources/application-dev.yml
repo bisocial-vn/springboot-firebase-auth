@@ -34,7 +34,7 @@ server:
 
 app:
   jwt:
-    privatekeyPath: ${JWT_PRIVATEKEY_PATH:classpath:.secret/privatekey-test}
+    privatekeyPath: ${JWT_PRIVATEKEY_PATH:classpath:/.secrets/privatekey-test}
     publickey: ${JWT_PUBLICKEY:MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgj3NAJDBF7aMunLlOonzY13FbPrURlmDZHMykWgElqKOVapLL6jWaQJnXkDWHFmedIBSRs7BMF924yl5Xg96CUEgEuGN9jzja8e7BiUZ/8vifZYCNCcGf2bCqbKOfPh1FYLTPCENchEbb1S8rN0Ruc4ebt4aq6EXE0rKkhr52KdaEvqyUIyMcnNhYJuGYrVdQ/fl9VIR27R9XCJKchUMm1Rv9c1ormiF3DrC7N/LN18f0wdspBclV6kI8IvQ1Gas/3wAztWvvrrnmBOuEqtmjkhEzOXEVjJQktsdo/Y7kRipH5R6rJ1CCd24OZggZz1lxOr2JqlgBqatbrSIvQauHQIDAQAB}
     accessTokenDuration: 1d
     refreshTokenDuration : 30d
@@ -44,11 +44,12 @@ app:
     type: Bearer
   firebase:
     credential:
-      uri: ${APP_FIREBASE_CREDENTIAL_URI:classpath:.secret/firebase-config.json}
+      uri: ${APP_FIREBASE_CREDENTIAL_URI:classpath:/.secrets/firebase-config.json}
   api:
     allowCorsDomains: 
       - http://localhost
       - http://localhost:3000
+      - http://localhost:5000
       - https://fir-auth-test-be3bb.web.app
       - https://fir-auth-test-be3bb.firebaseapp.com
   
